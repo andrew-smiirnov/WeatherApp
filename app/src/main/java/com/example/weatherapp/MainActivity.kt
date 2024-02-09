@@ -35,18 +35,28 @@ class MainActivity : ComponentActivity() {
                 val daysList = remember {
                     mutableStateOf(listOf<WeatherModel>())
                 }
+                val dialogState = remember {
+                    mutableStateOf(false)
+                }
                 val currentDay = remember {
-                    mutableStateOf(WeatherModel(
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""
+                    mutableStateOf(
+                        WeatherModel(
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            ""
+                        )
                     )
-                    )
+                }
+
+                if (dialogState.value) {
+                    DialogSearch(dialogState, onSubmit = {
+                        getData(it, this, daysList, currentDay)
+                    })
                 }
 
                 getData("38.34570,-0.49057", this, daysList, currentDay)
@@ -61,7 +71,12 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    MainCard(currentDay)
+                    MainCard(currentDay, onClickSync = {
+                        getData("38.34570,-0.49057", this@MainActivity, daysList, currentDay)
+                    },
+                        onClickSearch = {
+                            dialogState.value = true
+                        })
                     TabLayout(daysList, currentDay)
                 }
 
@@ -71,9 +86,11 @@ class MainActivity : ComponentActivity() {
 }
 
 
-private fun getData(city: String, context: Context,
-                    daysList: MutableState<List<WeatherModel>>,
-                    currentDay: MutableState<WeatherModel>) {
+private fun getData(
+    city: String, context: Context,
+    daysList: MutableState<List<WeatherModel>>,
+    currentDay: MutableState<WeatherModel>
+) {
     val url = "https://api.weatherapi.com/v1/forecast.json" +
             "?key=$API_KEY" +
             "&q=$city" +
@@ -123,7 +140,8 @@ private fun getWeatherByDays(response: String): List<WeatherModel> {
     }
     list[0] = list[0].copy(
         time = mainObject.getJSONObject("current").getString("last_updated"),
-        currentTemp = mainObject.getJSONObject("current").getString("temp_c").toFloat().toInt().toString()
+        currentTemp = mainObject.getJSONObject("current").getString("temp_c").toFloat().toInt()
+            .toString()
     )
     return list
 }

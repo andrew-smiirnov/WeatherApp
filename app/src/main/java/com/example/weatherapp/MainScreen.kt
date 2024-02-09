@@ -45,7 +45,10 @@ import org.json.JSONObject
 
 
 @Composable
-fun MainCard(currentDay: MutableState<WeatherModel>) {
+fun MainCard(currentDay: MutableState<WeatherModel>,
+             onClickSync: () -> Unit,
+             onClickSearch: () -> Unit
+             ) {
     Column()
     {
         Card(
@@ -103,7 +106,7 @@ fun MainCard(currentDay: MutableState<WeatherModel>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(onClick = {
-                        /*TODO*/
+                        onClickSearch.invoke()
                     }
                     ) {
                         Icon(
@@ -118,7 +121,7 @@ fun MainCard(currentDay: MutableState<WeatherModel>) {
                         text = "${currentDay.value.maxTemp}°C/" + "${currentDay.value.minTemp}°C"
                     )
                     IconButton(onClick = {
-                        /*TODO*/
+                        onClickSync.invoke()
                     }
                     ) {
                         Icon(
@@ -200,7 +203,7 @@ private fun getWeatherByHours(hours: String): List<WeatherModel>{
             WeatherModel(
                 "",
                 item.getString("time"),
-                item.getString("temp_c").toFloat().toInt().toString() + "°C",
+                item.getString("temp_c").toFloat().toInt().toString(),
                 item.getJSONObject("condition").getString("text"),
                 item.getJSONObject("condition").getString("icon"),
                 "",
